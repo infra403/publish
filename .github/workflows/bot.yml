@@ -11,6 +11,7 @@ jobs:
           [
             { name: 'windows', image: 'windows-latest' },
             { name: 'macos', image: 'macos-latest' },
+            { name: 'macosarm', image: 'macos-latest-xlarge' },
           ]
 
     runs-on: ${{ matrix.os.image }}
@@ -23,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Checkout additional private repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           repository: 'infra403/streamline-worker-v2'
           token: ${{ secrets.STREAMLINE_WORKER_CHECKOUT }}
