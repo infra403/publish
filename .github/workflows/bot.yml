@@ -1,0 +1,46 @@
+name: Release app
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          [
+            { name: 'windows', image: 'windows-latest' },
+            { name: 'macos', image: 'macos-latest' },
+            { name: 'macosarm', image: 'macos-latest-xlarge' },
+          ]
+
+    runs-on: ${{ matrix.os.image }}
+
+    steps:
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Checkout additional private repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'infra403/streamline-worker-v2'
+          token: ${{ secrets.STREAMLINE_WORKER_CHECKOUT }}
+          path: my-private-repo
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: my-private-repo
+      # Optionally build, test, or use the private repository here
+
+      - name: Build and publish app
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          mkdir src/data
+          npm run build:workflow
+          npm run publish
+        working-directory: my-private-repo
+
